@@ -1,5 +1,5 @@
 {
-  "name": "Automated Video Generation Workflow",
+  "name": "Automated Video Generation (Robust Polling with Ollama)",
   "nodes": [
     {
       "parameters": {},
@@ -18,21 +18,29 @@
           "string": [
             {
               "name": "topic",
-              "value": "3 Amazing Facts About the Moon"
+              "value": "3 Mind-Blowing Facts About Space"
             },
             {
               "name": "style",
-              "value": "energetic, educational, modern"
+              "value": "informative, fast-paced, high energy"
             },
             {
               "name": "voice",
               "value": "en-US-AvaNeural"
+            },
+            {
+              "name": "ollama_model",
+              "value": "llama3.1"
+            },
+            {
+              "name": "ollama_url",
+              "value": "http://localhost:11434/api/generate"
             }
           ],
           "number": [
             {
               "name": "font_size",
-              "value": 65
+              "value": 60
             }
           ]
         },
@@ -71,14 +79,16 @@
               "value": "={{ $json.font_size }}"
             },
             {
-              "name": "background",
-              "value": "false"
+              "name": "ollama_model",
+              "value": "={{ $json.ollama_model }}"
+            },
+            {
+              "name": "ollama_url",
+              "value": "={{ $json.ollama_url }}"
             }
           ]
         },
-        "options": {
-          "timeout": 120000
-        }
+        "options": {}
       },
       "id": "55c4852c-bd3d-4c38-89c0-db8b3a0cc7ff",
       "name": "Call Video API",
@@ -91,29 +101,110 @@
     },
     {
       "parameters": {
-        "url": "=http://127.0.0.1:8000{{ $json.assets.video }}",
-        "responseFormat": "file",
-        "options": {}
+        "amount": 5,
+        "unit": "seconds"
       },
-      "id": "2eefc7d4-8d99-4c12-a725-3efd0a927a4d",
-      "name": "Download Video File",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4,
+      "id": "76efc7d4-8d99-4c12-a725-3efd0a927a4f",
+      "name": "Wait 5 Seconds",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
       "position": [
-        720,
+        700,
         300
       ]
     },
     {
       "parameters": {
-        "notice": "This is a placeholder node. Connect your Discord Webhook, Google Drive Upload, or Telegram node here to publish the video file downloaded from the previous node."
+        "url": "=http://127.0.0.1:8000/status/{{ $('Call Video API').item.json.job_id }}",
+        "options": {}
+      },
+      "id": "56efc7d4-8d99-4c12-a725-3efd0a927a40",
+      "name": "Get Job Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        880,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "value2": "completed"
+            }
+          ]
+        }
+      },
+      "id": "86efc7d4-8d99-4c12-a725-3efd0a927a41",
+      "name": "Is Render Complete?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "value2": "failed"
+            }
+          ]
+        }
+      },
+      "id": "86efc7d4-8d99-4c12-a725-3efd0a927a42",
+      "name": "Is Render Failed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=http://127.0.0.1:8000/download/{{ $('Call Video API').item.json.job_id }}",
+        "responseFormat": "file",
+        "options": {}
+      },
+      "id": "2eefc7d4-8d99-4c12-a725-3efd0a927a4d",
+      "name": "Download Final Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1320,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "notice": "Video rendering failed. Check node outputs or API server console logs for details."
       },
       "id": "3fefc7d4-8d99-4c12-a725-3efd0a927a4e",
-      "name": "Publish/Notify Placeholder",
+      "name": "Render Failed Alert",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        940,
+        1320,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "notice": "Connect your post-production actions (like Discord hooks or Drive Uploads) here using the binary video downloaded in the previous node."
+      },
+      "id": "4fefc7d4-8d99-4c12-a725-3efd0a927a4f",
+      "name": "Publish/Distribute Placeholder",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1520,
         300
       ]
     }
@@ -145,18 +236,76 @@
       "main": [
         [
           {
-            "node": "Download Video File",
+            "node": "Wait 5 Seconds",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Download Video File": {
+    "Wait 5 Seconds": {
       "main": [
         [
           {
-            "node": "Publish/Notify Placeholder",
+            "node": "Get Job Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Job Status": {
+      "main": [
+        [
+          {
+            "node": "Is Render Complete?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Render Complete?": {
+      "main": [
+        [
+          {
+            "node": "Download Final Video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Render Failed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Render Failed?": {
+      "main": [
+        [
+          {
+            "node": "Render Failed Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 5 Seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Final Video": {
+      "main": [
+        [
+          {
+            "node": "Publish/Distribute Placeholder",
             "type": "main",
             "index": 0
           }
@@ -166,5 +315,5 @@
   },
   "active": false,
   "settings": {},
-  "id": "video-pipeline-workflow-id"
+  "id": "video-pipeline-polling-workflow"
 }

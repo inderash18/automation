@@ -1,9 +1,11 @@
 import os
 import uuid
 import logging
+import asyncio
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
@@ -21,11 +23,10 @@ load_dotenv()
 
 app = FastAPI(
     title="Automated Video Generation API",
-    description="FastAPI bridge for n8n to generate automated scripts, speech, and video composites.",
-    version="1.0.0"
+    description="Orchestrator server for subtitle-overlaid video generation workflows with local Ollama support.",
+    version="2.1.0"
 )
 
-# Enable CORS for local testing/access
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -34,100 +35,86 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount the assets folder to serve the generated audio and videos statically
-os.makedirs("assets", exist_ok=True)
+# Ensure jobs base directories exist
+os.makedirs("assets/jobs", exist_ok=True)
 app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 
+# Global in-memory job store
+jobs_db = {}
+
 # Request Models
-class ScriptRequest(BaseModel):
-    topic: str = Field(..., example="5 shocking facts about the oceans")
-    style: str = Field("engaging, informative, fast-paced", example="engaging, mystery-style")
-    duration: str = Field("60 seconds", example="30 seconds")
-    output_path: str = Field("assets/script.txt", example="assets/script.txt")
-
-class TTSRequest(BaseModel):
-    text: str = Field(None, description="Direct text to convert. If empty, reads assets/script.txt")
-    voice: str = Field("en-US-AvaNeural", description="Microsoft Edge TTS voice name")
-    output_audio: str = Field("assets/voice.mp3")
-    output_srt: str = Field("assets/voice.srt")
-
-class VideoRequest(BaseModel):
-    bg_path: str = Field("assets/bg.mp4", description="Path to background video (optional)")
-    audio_path: str = Field("assets/voice.mp3")
-    srt_path: str = Field("assets/voice.srt")
-    output_path: str = Field("assets/final.mp4")
-    width: int = Field(1080)
-    height: int = Field(1920)
-    font_size: int = Field(60)
-
 class PipelineRequest(BaseModel):
-    topic: str
-    style: str = "engaging, informative, fast-paced"
-    duration: str = "60 seconds"
-    voice: str = "en-US-AvaNeural"
-    bg_path: str = "assets/bg.mp4"
-    font_size: int = 60
-    background: bool = Field(False, description="Whether to run in the background as an async task")
+    topic: str = Field(..., json_schema_extra={"example": "3 shocking facts about deep ocean life"})
+    style: str = Field("engaging, informative, fast-paced", json_schema_extra={"example": "mysterious, cinematic"})
+    duration: str = Field("60 seconds", json_schema_extra={"example": "30 seconds"})
+    voice: str = Field("en-US-AvaNeural", json_schema_extra={"example": "en-US-AndrewNeural"})
+    bg_path: str = Field("assets/bg.mp4", description="Path to background video (optional)")
+    font_size: int = Field(60, json_schema_extra={"example": 65})
+    ollama_model: str = Field("llama3.1", description="Local Ollama model name to try first")
+    ollama_url: str = Field("http://localhost:11434/api/generate", description="Local Ollama HTTP endpoint")
 
-# Simple memory store for background tasks
-task_store = {}
+def run_job_pipeline(job_id: str, req: PipelineRequest):
+    """
+    Executes script, TTS, and video rendering sequentially in the background.
+    All outputs are saved under assets/jobs/{job_id}/ to prevent overlaps.
+    """
+    job_dir = f"assets/jobs/{job_id}"
+    os.makedirs(job_dir, exist_ok=True)
+    
+    script_path = os.path.join(job_dir, "script.txt")
+    audio_path = os.path.join(job_dir, "voice.mp3")
+    srt_path = os.path.join(job_dir, "voice.srt")
+    video_path = os.path.join(job_dir, "final.mp4")
 
-def execute_pipeline(task_id: str, req: PipelineRequest):
-    """Executes the full pipeline and updates the task store."""
     try:
-        task_store[task_id] = {"status": "processing", "progress": "generating script"}
-        logger.info(f"Task {task_id}: Generating script...")
-        
-        # 1. Script Generation
+        # Step 1: Script Generation (with Ollama prioritisation)
+        jobs_db[job_id] = {"status": "processing", "progress": "generating script"}
+        logger.info(f"Job {job_id}: Generating script...")
         script_text = generate_script(
             topic=req.topic,
             style=req.style,
             duration=req.duration,
-            output_path="assets/script.txt"
+            output_path=script_path,
+            ollama_model=req.ollama_model,
+            ollama_url=req.ollama_url
         )
         
-        # 2. TTS Generation
-        task_store[task_id] = {"status": "processing", "progress": "generating text-to-speech"}
-        logger.info(f"Task {task_id}: Converting text to speech...")
-        
-        import asyncio
-        # edge-tts is async, so we run it in a new event loop or using the current runner
+        # Step 2: TTS Generation
+        jobs_db[job_id] = {"status": "processing", "progress": "generating speech audio"}
+        logger.info(f"Job {job_id}: Generating audio and subtitles...")
         asyncio.run(text_to_speech(
             text=script_text,
             voice=req.voice,
-            output_audio="assets/voice.mp3",
-            output_srt="assets/voice.srt"
+            output_audio=audio_path,
+            output_srt=srt_path
         ))
         
-        # 3. Video composition
-        task_store[task_id] = {"status": "processing", "progress": "compositing video"}
-        logger.info(f"Task {task_id}: Building video composition...")
-        
+        # Step 3: Video compositing
+        jobs_db[job_id] = {"status": "processing", "progress": "rendering composite video"}
+        logger.info(f"Job {job_id}: Rendering subtitle layer and video...")
         build_video(
             bg_path=req.bg_path,
-            audio_path="assets/voice.mp3",
-            srt_path="assets/voice.srt",
-            output_path="assets/final.mp4",
+            audio_path=audio_path,
+            srt_path=srt_path,
+            output_path=video_path,
             width=1080,
             height=1920,
             font_size=req.font_size
         )
         
-        task_store[task_id] = {
+        # Mark complete
+        jobs_db[job_id] = {
             "status": "completed",
             "progress": "done",
-            "assets": {
-                "script": "/assets/script.txt",
-                "audio": "/assets/voice.mp3",
-                "srt": "/assets/voice.srt",
-                "video": "/assets/final.mp4"
-            }
+            "video_path": video_path
         }
-        logger.info(f"Task {task_id}: Completed successfully.")
+        logger.info(f"Job {job_id}: Render completed successfully.")
+        
     except Exception as e:
-        logger.error(f"Task {task_id} failed: {e}")
-        task_store[task_id] = {
+        logger.error(f"Job {job_id} failed: {e}")
+        jobs_db[job_id] = {
             "status": "failed",
+            "progress": "error",
             "error": str(e)
         }
 
@@ -135,107 +122,56 @@ def execute_pipeline(task_id: str, req: PipelineRequest):
 def read_root():
     return {
         "status": "online",
-        "message": "Automated Video Pipeline Server is running.",
+        "message": "Automated Video Pipeline Server v2.1 (Ollama-first & Job-based polling model)",
         "endpoints": {
-            "/generate-script": "POST",
-            "/generate-audio": "POST",
-            "/generate-video": "POST",
             "/run-pipeline": "POST",
-            "/task/{task_id}": "GET",
-            "/assets/{filename}": "GET"
+            "/status/{job_id}": "GET",
+            "/download/{job_id}": "GET"
         }
     }
 
-@app.post("/generate-script")
-def api_generate_script(req: ScriptRequest):
-    try:
-        script_text = generate_script(
-            topic=req.topic,
-            style=req.style,
-            duration=req.duration,
-            output_path=req.output_path
-        )
-        return {
-            "status": "success",
-            "script_path": f"/{req.output_path}",
-            "content": script_text
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/generate-audio")
-async def api_generate_audio(req: TTSRequest):
-    try:
-        text_content = req.text
-        if not text_content:
-            if not os.path.exists("assets/script.txt"):
-                raise HTTPException(status_code=400, detail="No text provided, and assets/script.txt does not exist.")
-            with open("assets/script.txt", "r", encoding="utf-8") as f:
-                text_content = f.read().strip()
-                
-        await text_to_speech(
-            text=text_content,
-            voice=req.voice,
-            output_audio=req.output_audio,
-            output_srt=req.output_srt
-        )
-        return {
-            "status": "success",
-            "audio_path": f"/{req.output_audio}",
-            "srt_path": f"/{req.output_srt}"
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/generate-video")
-def api_generate_video(req: VideoRequest):
-    try:
-        build_video(
-            bg_path=req.bg_path,
-            audio_path=req.audio_path,
-            srt_path=req.srt_path,
-            output_path=req.output_path,
-            width=req.width,
-            height=req.height,
-            font_size=req.font_size
-        )
-        return {
-            "status": "success",
-            "video_path": f"/{req.output_path}"
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
 @app.post("/run-pipeline")
-def api_run_pipeline(req: PipelineRequest, background_tasks: BackgroundTasks):
-    task_id = str(uuid.uuid4())[:8]
+def run_pipeline(req: PipelineRequest, background_tasks: BackgroundTasks):
+    job_id = str(uuid.uuid4())[:12] # Generate unique job ID
     
-    if req.background:
-        # Run asynchronously in the background
-        background_tasks.add_task(execute_pipeline, task_id, req)
-        task_store[task_id] = {"status": "queued", "progress": "waiting to start"}
-        return {
-            "status": "queued",
-            "task_id": task_id,
-            "check_status_url": f"/task/{task_id}"
-        }
-    else:
-        # Run synchronously
-        logger.info(f"Running synchronous pipeline task: {task_id}")
-        execute_pipeline(task_id, req)
-        result = task_store.get(task_id, {"status": "failed", "error": "Unknown failure"})
-        if result["status"] == "failed":
-            raise HTTPException(status_code=500, detail=result.get("error"))
-        return result
+    # Initialize job state
+    jobs_db[job_id] = {
+        "status": "processing",
+        "progress": "queued"
+    }
+    
+    # Run pipeline in background
+    background_tasks.add_task(run_job_pipeline, job_id, req)
+    
+    return {
+        "status": "processing",
+        "job_id": job_id
+    }
 
-@app.get("/task/{task_id}")
-def check_task_status(task_id: str):
-    task = task_store.get(task_id)
-    if not task:
-        raise HTTPException(status_code=404, detail="Task not found")
-    return task
+@app.get("/status/{job_id}")
+def get_job_status(job_id: str):
+    job = jobs_db.get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job ID not found")
+    return job
+
+@app.get("/download/{job_id}")
+def download_job_video(job_id: str):
+    job = jobs_db.get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job ID not found")
+        
+    if job["status"] == "processing":
+        raise HTTPException(status_code=400, detail="Video is still rendering. Please check /status/ again soon.")
+    elif job["status"] == "failed":
+        raise HTTPException(status_code=500, detail=f"Job failed: {job.get('error')}")
+        
+    video_path = job.get("video_path")
+    if not video_path or not os.path.exists(video_path):
+        raise HTTPException(status_code=404, detail="Generated video file not found on disk")
+        
+    return FileResponse(video_path, media_type="video/mp4", filename=f"final_{job_id}.mp4")
 
 if __name__ == "__main__":
     import uvicorn
-    # Start FastAPI server on port 8000
     uvicorn.run("server:app", host="127.0.0.1", port=8000, reload=True)

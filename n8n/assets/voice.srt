@@ -1,20 +1,44 @@
 1
-00:00:00,050 --> 00:00:02,675
-Did you know that space is completely silent?
+00:00:00,100 --> 00:00:05,125
+Imagine a world where the sky is always painted red and gold during sunset.
 
 2
-00:00:02,675 --> 00:00:07,475
-Sound waves need a medium like air to travel, but space is a vacuum.
+00:00:05,075 --> 00:00:11,225
+A place where volcanoes erupt continuously, spewing out thick clouds of sulfuric acid.
 
 3
-00:00:07,475 --> 00:00:11,450
-Also, one day on Venus is longer than a year on Venus.
+00:00:11,225 --> 00:00:15,225
+Welcome to Venus, the scorching hot twin sister of Earth.
 
 4
-00:00:11,450 --> 00:00:16,087
-Finally, there are more trees on Earth than stars in the Milky Way galaxy!
+00:00:15,225 --> 00:00:24,200
+The average temperature on Venus reaches as high as 462 degrees Celsius, making it the hottest planet in our solar system.
 
 5
-00:00:16,087 --> 00:00:18,250
-Subscribe for more cosmic facts.
+00:00:24,200 --> 00:00:29,200
+That's even hotter than the surface of Mercury, which orbits closer to the sun.
+
+6
+00:00:29,200 --> 00:00:34,450
+But what's most surprising is that Venus was once thought to be a potential habitable world.
+
+7
+00:00:34,450 --> 00:00:41,062
+New research suggests that the planet may have had liquid water on its surface just 700 million years ago.
+
+8
+00:00:41,062 --> 00:00:45,162
+Who knows, maybe there's still life lurking beneath those thick clouds?
+
+9
+00:00:45,162 --> 00:00:48,362
+Venus is full of mysteries waiting to be uncovered.
+
+10
+00:00:48,362 --> 00:00:50,875
+Want to learn more about this scorching hot world?
+
+11
+00:00:50,875 --> 00:00:54,637
+Check out our link in bio for more fascinating facts and theories!
 
