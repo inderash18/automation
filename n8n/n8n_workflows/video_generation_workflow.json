@@ -1,0 +1,170 @@
+{
+  "name": "Automated Video Generation Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "e2a2223a-fde4-4860-843e-db4ffbe32c7f",
+      "name": "When clicking \"Execute\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "topic",
+              "value": "3 Amazing Facts About the Moon"
+            },
+            {
+              "name": "style",
+              "value": "energetic, educational, modern"
+            },
+            {
+              "name": "voice",
+              "value": "en-US-AvaNeural"
+            }
+          ],
+          "number": [
+            {
+              "name": "font_size",
+              "value": 65
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a90df7bb-cce8-4f8a-939e-a0bfcb9b3627",
+      "name": "Set Topic & Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        300,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/run-pipeline",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "topic",
+              "value": "={{ $json.topic }}"
+            },
+            {
+              "name": "style",
+              "value": "={{ $json.style }}"
+            },
+            {
+              "name": "voice",
+              "value": "={{ $json.voice }}"
+            },
+            {
+              "name": "font_size",
+              "value": "={{ $json.font_size }}"
+            },
+            {
+              "name": "background",
+              "value": "false"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "55c4852c-bd3d-4c38-89c0-db8b3a0cc7ff",
+      "name": "Call Video API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        500,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=http://127.0.0.1:8000{{ $json.assets.video }}",
+        "responseFormat": "file",
+        "options": {}
+      },
+      "id": "2eefc7d4-8d99-4c12-a725-3efd0a927a4d",
+      "name": "Download Video File",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        720,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "notice": "This is a placeholder node. Connect your Discord Webhook, Google Drive Upload, or Telegram node here to publish the video file downloaded from the previous node."
+      },
+      "id": "3fefc7d4-8d99-4c12-a725-3efd0a927a4e",
+      "name": "Publish/Notify Placeholder",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        940,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking \"Execute\"": {
+      "main": [
+        [
+          {
+            "node": "Set Topic & Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Topic & Config": {
+      "main": [
+        [
+          {
+            "node": "Call Video API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Video API": {
+      "main": [
+        [
+          {
+            "node": "Download Video File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Video File": {
+      "main": [
+        [
+          {
+            "node": "Publish/Notify Placeholder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "video-pipeline-workflow-id"
+}
