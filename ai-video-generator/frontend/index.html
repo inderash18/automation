@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShortsFlow Studio - Enterprise AI Video Engine</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="mesh-background-system">
+        <div class="mesh-orb orb-primary"></div>
+        <div class="mesh-orb orb-secondary"></div>
+        <div class="mesh-orb orb-tertiary"></div>
+    </div>
+
+    <main class="workspace-viewport">
+        <header class="app-global-header">
+            <div class="brand-identity">
+                <div class="brand-icon-wrapper">
+                    <i class="fa-solid fa-wand-magic-sparkles brand-icon"></i>
+                </div>
+                <h1 class="brand-title">Shorts<span class="gradient-accent">Flow</span> <span class="version-tag">v2.0</span></h1>
+            </div>
+            <p class="brand-tagline">Transform core text prompt arrays into multi-channel algorithmic virality in seconds.</p>
+        </header>
+
+        <section class="master-control-card">
+            
+            <div id="input-view" class="view-panel active">
+                <div class="panel-header-block">
+                    <h2 class="panel-primary-title">Engine Parameters</h2>
+                    <p class="panel-secondary-desc">Configure your target core distribution asset parameters for autonomous rendering workflows.</p>
+                </div>
+                
+                <form id="generator-form" class="studio-pipeline-form" onsubmit="event.preventDefault();">
+                    <div class="form-grid-configuration">
+                        <div class="config-column main-controls">
+                            <div class="input-component-group">
+                                <div class="component-header-meta">
+                                    <label for="topic" class="studio-input-label">Core Topic / Narrative Objective</label>
+                                    <button type="button" id="trend-btn" class="engine-pill-button primary-pill">
+                                        <i class="fa-solid fa-fire-flame-curved"></i> <span>Surprise Me</span>
+                                    </button>
+                                </div>
+                                <div class="studio-input-container">
+                                    <i class="fa-regular fa-lightbulb component-embedded-icon"></i>
+                                    <input type="text" id="topic" name="topic" placeholder="e.g., The dark truth about deep sea exploration networks..." required autocomplete="off">
+                                </div>
+                            </div>
+
+                            <div class="advanced-accordion-trigger" onclick="this.classList.toggle('expanded');">
+                                <span class="accordion-title"><i class="fa-solid fa-sliders"></i> Engine Generation Modifiers</span>
+                                <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+                            </div>
+
+                            <div class="advanced-engine-dropdown-tray">
+                                <div class="tray-inner-grid">
+                                    <div class="dropdown-component">
+                                        <label class="studio-input-label">AI Voice Matrix Narrator</label>
+                                        <select class="studio-select-engine">
+                                            <option value="en-US-ChristopherNeural">Edge-TTS (Male) — Christopher</option>
+                                            <option value="en-US-AvaNeural">Edge-TTS (Female) — Ava</option>
+                                            <option value="en-GB-SoniaNeural">Edge-TTS (UK Female) — Sonia</option>
+                                            <option value="en-US-BrianNeural">Edge-TTS (Male Pro) — Brian</option>
+                                        </select>
+                                    </div>
+                                    <div class="dropdown-component">
+                                        <label class="studio-input-label">Subtitle Formatting Preset</label>
+                                        <select class="studio-select-engine">
+                                            <option value="hormozi">Hormozi Kinetic (Bold Yellow/White)</option>
+                                            <option value="minimal">Minimalist Modern (Bottom Centered)</option>
+                                            <option value="beast">Beast Style (Neon Green Accent Glow)</option>
+                                        </select>
+                                    </div>
+                                    <div class="dropdown-component full-width-dropdown">
+                                        <label class="studio-input-label">Background Audio Context</label>
+                                        <select class="studio-select-engine">
+                                            <option value="none">Zero Background Score (Narrative Only)</option>
+                                            <option value="cinematic">Cinematic Ambient Tension Sub-Tracks</option>
+                                            <option value="lofi">Lofi Modern Hip-Hop Aesthetic Beats</option>
+                                            <option value="phonk">Aggressive Phonk Viral Hyper-Tracks</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="config-column aspect-selector-panel">
+                            <label class="studio-input-label">Asset Aspect Format Profile</label>
+                            <div class="format-selection-matrix">
+                                <label class="format-card active">
+                                    <input type="radio" name="aspect-ratio" value="shorts" checked class="hidden-radio">
+                                    <div class="format-visual-indicator ratio-9-16"></div>
+                                    <span class="format-main-title">YouTube Shorts</span>
+                                    <span class="format-meta-desc">9:16 vertical • 1080x1920</span>
+                                </label>
+                                <label class="format-card">
+                                    <input type="radio" name="aspect-ratio" value="reels" class="hidden-radio">
+                                    <div class="format-visual-indicator ratio-9-16 reels-color"></div>
+                                    <span class="format-main-title">Instagram Reels</span>
+                                    <span class="format-meta-desc">9:16 cinematic • Realtime Frame</span>
+                                </label>
+                                <label class="format-card">
+                                    <input type="radio" name="aspect-ratio" value="tiktok" class="hidden-radio">
+                                    <div class="format-visual-indicator ratio-9-16 tiktok-color"></div>
+                                    <span class="format-main-title">TikTok Target</span>
+                                    <span class="format-meta-desc">9:16 high-bitrate • Algorithmic</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="generate-btn" class="studio-action-button primary-action">
+                        <span>Initialize Generation Matrix</span>
+                        <i class="fa-solid fa-bolt-lightning button-action-icon"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div id="loading-view" class="view-panel">
+                <div class="rendering-engine-loader">
+                    <div class="loader-wave-ring"></div>
+                    <div class="loader-wave-ring"></div>
+                    <div class="loader-wave-ring"></div>
+                    <div class="loader-center-hub">
+                        <i class="fa-solid fa-processor fa-spin-pulse"></i>
+                    </div>
+                </div>
+                <h2 class="panel-primary-title">Compiling Asset Matrix</h2>
+                <p id="loading-status" class="rendering-active-status">Parsing orchestration layers...</p>
+                
+                <div class="pipeline-orchestrator-status-box">
+                    <div class="pipeline-step-node current" id="step-script">
+                        <div class="node-icon-wrapper">
+                            <i class="fa-solid fa-circle-notch fa-spin status-processing"></i>
+                            <i class="fa-regular fa-circle status-awaiting"></i>
+                            <i class="fa-solid fa-circle-check status-done"></i>
+                        </div>
+                        <div class="node-text-matrix">
+                            <span class="node-label-title">Script Logic Matrix Compilation</span>
+                            <span class="node-label-subtitle">Ollama LLaMA 3 Array Engine Execution</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pipeline-step-node pending" id="step-voice">
+                        <div class="node-icon-wrapper">
+                            <i class="fa-solid fa-circle-notch fa-spin status-processing"></i>
+                            <i class="fa-regular fa-circle status-awaiting"></i>
+                            <i class="fa-solid fa-circle-check status-done"></i>
+                        </div>
+                        <div class="node-text-matrix">
+                            <span class="node-label-title">Neural Frequency Synthesis</span>
+                            <span class="node-label-subtitle">Edge-TTS High-Fidelity Audio Generation</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pipeline-step-node pending" id="step-stock">
+                        <div class="node-icon-wrapper">
+                            <i class="fa-solid fa-circle-notch fa-spin status-processing"></i>
+                            <i class="fa-regular fa-circle status-awaiting"></i>
+                            <i class="fa-solid fa-circle-check status-done"></i>
+                        </div>
+                        <div class="node-text-matrix">
+                            <span class="node-label-title">B-Roll Visual Engine Asset Fetch</span>
+                            <span class="node-label-subtitle">Pexels Vertical API Extraction System</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pipeline-step-node pending" id="step-merge">
+                        <div class="node-icon-wrapper">
+                            <i class="fa-solid fa-circle-notch fa-spin status-processing"></i>
+                            <i class="fa-regular fa-circle status-awaiting"></i>
+                            <i class="fa-solid fa-circle-check status-done"></i>
+                        </div>
+                        <div class="node-text-matrix">
+                            <span class="node-label-title">FFmpeg / MoviePy Core Compositry</span>
+                            <span class="node-label-subtitle">Hardburning Subtitles & Rendering Alpha Channel Tracks</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <p class="pipeline-notice-tip"><i class="fa-solid fa-circle-info"></i> Global pipeline initialization is accelerated by GPU processing architecture.</p>
+            </div>
+
+            <div id="result-view" class="view-panel">
+                <h2 class="panel-primary-title system-success-text"><i class="fa-solid fa-circle-check"></i> Asset Export Formatted</h2>
+                <p class="panel-secondary-desc">The localized render array compiled successfully. Review metrics and deploy to social channels.</p>
+                
+                <div class="studio-output-split-grid">
+                    <div class="viewport-deck-column">
+                        <div class="device-mockup-enclosure">
+                            <div class="device-notch-housing"></div>
+                            <div class="device-internal-viewport">
+                                <video id="video-preview" controls playsinline>
+                                    <source src="" type="video/mp4">
+                                    Your architecture cannot access standard hardware HTML5 rendering profiles.
+                                </video>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metadata-optimization-engine-box">
+                        <div class="metadata-dashboard-header">
+                            <span class="dashboard-panel-label"><i class="fa-solid fa-chart-line"></i> Meta Engine Optimizer</span>
+                            <div id="score-badge" class="score-badge-system-display">Viral Index: 94%</div>
+                        </div>
+                        
+                        <div class="dashboard-field-component">
+                            <div class="field-interactive-header">
+                                <label for="meta-title">Algorithmic Target Title Hook</label>
+                                <button type="button" class="copy-action-trigger" data-target="meta-title">
+                                    <i class="fa-regular fa-copy"></i> <span>Copy String</span>
+                                </button>
+                            </div>
+                            <input type="text" id="meta-title" readonly class="dashboard-read-only-input">
+                        </div>
+
+                        <div class="dashboard-field-component">
+                            <div class="field-interactive-header">
+                                <label for="meta-tags">Optimized Core Indexing Tags</label>
+                                <button type="button" class="copy-action-trigger" data-target="meta-tags">
+                                    <i class="fa-regular fa-copy"></i> <span>Copy String</span>
+                                </button>
+                            </div>
+                            <input type="text" id="meta-tags" readonly class="dashboard-read-only-input">
+                        </div>
+
+                        <div class="dashboard-field-component">
+                            <div class="field-interactive-header">
+                                <label for="meta-script">Generated AI Script Transcription</label>
+                                <button type="button" class="copy-action-trigger" data-target="meta-script">
+                                    <i class="fa-regular fa-copy"></i> <span>Copy String</span>
+                                </button>
+                            </div>
+                            <textarea id="meta-script" readonly class="dashboard-read-only-input modern-scrollbar" rows="4"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Direct YouTube Publishing Integration Card -->
+                <div class="youtube-integration-card">
+                    <div class="youtube-card-header">
+                        <i class="fa-brands fa-youtube youtube-logo-icon"></i>
+                        <div class="youtube-header-text">
+                            <h3>Deploy Directly to YouTube Shorts</h3>
+                            <p>Distribute the generated MP4 file to your channel instantly using Google OAuth.</p>
+                        </div>
+                    </div>
+                    
+                    <div id="youtube-setup-guide" class="youtube-status-message warning-status" style="display: none;">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <div>
+                            <strong>Missing API Credentials (client_secrets.json):</strong><br>
+                            To publish directly from the dashboard, you must download desktop credentials:
+                            <ol>
+                                <li>Go to the <a href="https://console.cloud.google.com" target="_blank" style="color: #ff5e5e; text-decoration: underline;">Google Cloud Console</a>, create a project, and enable the <strong>YouTube Data API v3</strong>.</li>
+                                <li>Configure the <strong>OAuth Consent Screen</strong> (External/Internal, add your email as a test user).</li>
+                                <li>Go to <strong>Credentials</strong> -> <strong>Create Credentials</strong> -> <strong>OAuth client ID</strong> (Application Type: <em>Desktop App</em>).</li>
+                                <li>Download the JSON file, rename it to <code>client_secrets.json</code>, and save it in the root folder of this project.</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div id="youtube-upload-form" class="youtube-form-grid" style="display: none;">
+                        <div class="youtube-input-group">
+                            <label class="studio-input-label" for="yt-title">YouTube Title (Max 100 chars)</label>
+                            <input type="text" id="yt-title" maxlength="100" class="youtube-input-field">
+                        </div>
+                        <div class="youtube-input-group">
+                            <label class="studio-input-label" for="yt-privacy">Privacy Setting</label>
+                            <select id="yt-privacy" class="youtube-select-field">
+                                <option value="private">Private (Recommended - uploads for verification)</option>
+                                <option value="unlisted">Unlisted</option>
+                                <option value="public">Public</option>
+                            </select>
+                        </div>
+                        <div class="youtube-input-group full-width">
+                            <label class="studio-input-label" for="yt-desc">Video Description</label>
+                            <textarea id="yt-desc" rows="3" class="youtube-input-field modern-scrollbar"></textarea>
+                        </div>
+                        
+                        <div class="youtube-action-bar">
+                            <button type="button" id="yt-upload-btn" class="youtube-publish-button">
+                                <i class="fa-solid fa-circle-arrow-up"></i>
+                                <span>Publish to YouTube Channel</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="youtube-upload-progress" class="youtube-progress-container" style="display: none;">
+                        <div class="progress-header-info">
+                            <span id="yt-progress-status"><i class="fa-solid fa-spinner fa-spin"></i> Initializing upload...</span>
+                            <span id="yt-progress-percent">0%</span>
+                        </div>
+                        <div class="progress-bar-track">
+                            <div id="yt-progress-fill" class="progress-bar-fill" style="width: 0%;"></div>
+                        </div>
+                        <p class="yt-helper-hint"><i class="fa-solid fa-info-circle"></i> If this is your first upload, a browser tab will open requesting Google authorization.</p>
+                    </div>
+
+                    <div id="youtube-upload-success" class="youtube-success-container" style="display: none;">
+                        <i class="fa-solid fa-circle-check success-check-icon"></i>
+                        <div class="success-message-text">
+                            <h4>Video Successfully Published!</h4>
+                            <p>Your Short has been uploaded. You can view or configure it here:</p>
+                            <a id="yt-video-link" href="#" target="_blank" class="yt-video-link-anchor">
+                                <i class="fa-solid fa-external-link"></i> Open on YouTube Studio
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="export-actions-control-wrapper">
+                    <a id="download-btn" href="#" class="studio-action-button success-action" download>
+                        <i class="fa-solid fa-cloud-arrow-down"></i>
+                        <span>Export Masters High-Bitrate .MP4</span>
+                    </a>
+                    <button id="reset-btn" class="studio-action-button secondary-action">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        <span>Recycle Video Engine Loop</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <footer class="app-global-footer">
+            <p>Engine Core Infrastructure: <span class="badge-system">Ollama LLaMA 3 Matrix</span> <span class="badge-system">Edge-TTS API</span> <span class="badge-system">MoviePy Framework Engine v2</span></p>
+            <p class="licensing-attribution-text">Vertical stream content pulled using secure webhook architectures through the open source Pexels API platform.</p>
+        </footer>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
